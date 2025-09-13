@@ -1,0 +1,80 @@
+{% extends 'base/base.html' %} 
+
+
+{% block start %}
+<div class="product-details-container">
+    <div class="product-images">
+      <img id="main-image" class="product-image" src="/media/{{product.product_images.first.image}}" alt="Product Image">
+      <div class="thumbnail-images">
+        {% for image in product.product_images.all %}
+            <img src="/media/{{image.image}}" class="thumbnail" onmouseover="changeImage(this)">
+        {% endfor %}
+    </div>
+    </div>
+    <div class="product-info">
+      <div class="product-names">{{product.product_name}}</div>
+      <div class="product-price">
+        ₹
+        {% if updated_price %}
+          {{updated_price}}
+        {% else %}  
+          {{product.price}}
+
+        {% endif %}
+
+      </div>
+      <div class="product-description">
+        {{product.product_description}}
+      </div>
+      <div class="product-meta">
+        <p><strong>Reviews:</strong> 4.5/5 (200 reviews)</p>
+        <p><strong>Total Orders:</strong> 1500</p>
+        <p><strong>Color:</strong> Black</p>
+        <p><strong>Delivery:</strong> Free delivery within 5-7 business days</p>
+        <p><strong>Quantity:</strong> 
+          <form>
+          <input type="number" value="1" min="1" max="10"></p>
+          {% if product.size_variant.count %}
+
+          <strong>Sizes:</strong> 
+          <br>
+            <div class="f">
+              {% for size in product.size_variant.all %}  
+
+              {{size.size_name}} <input value="{{size.size_name}}" type="radio" onchange="get_correct_price('{{size.size_name}}')" name="size" {% if selected_size == size.size_name %} checked {% endif %} required>
+                <br>
+            {% endfor %}
+            </div>
+          {% endif %}
+      </div>
+        
+      <div class="product-actions">
+        <button class="buy-now-button">Buy Now</button>
+            <button type="submit" class="add-to-cart-button">
+              <a href="{% url 'add_to_cart' product.uid %}?variant={{selected_size}}" style="text-decoration:none;color:white;">
+                Add to Cart
+                 </button>
+              </a>
+            </button>
+      </div>
+    </form>
+      <a class="back-button" href="{% url 'index' %}">Back to Products</a>
+
+    </div>
+    
+  </div>
+  
+  <script>
+    function changeImage(thumbnail) {
+      const mainImage = document.getElementById('main-image');
+      mainImage.src = thumbnail.src;
+    }
+
+    function get_correct_price(size){
+      console.log(size)
+      window.location.href = window.location.pathname + `?size=${size}`
+    }
+  </script>
+  
+
+{% endblock %}

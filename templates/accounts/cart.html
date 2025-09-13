@@ -1,0 +1,142 @@
+{% extends 'base/base.html' %}
+
+
+{% block start %}
+
+<style>
+    header {
+        background-color: #343a40;
+        color: white;
+        text-align: center;
+        padding: 10px 0;
+    }
+    
+    main {
+        padding: 20px;
+    }
+    
+    .cart-item {
+        margin-bottom: 20px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        background-color: #fff;
+        border-radius: 5px;
+    }
+    
+    .cart-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+    }
+    
+    .cart-column {
+        flex: 1;
+        padding: 10px;
+        text-align: center;
+    }
+    
+    .product-imagey img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+    }
+    
+    .product-namey {
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+    
+    .product-quantity input {
+        width: 60px;
+        margin-left: 10px;
+    }
+    
+    .product-pricey {
+        font-weight: bold;
+    }
+    
+    .remove-btn-container {
+        text-align: right;
+    }
+    
+    .remove-btn {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        cursor: pointer;
+        border-radius: 3px;
+        font-size: 0.9em;
+    }
+    
+    .remove-btn:hover {
+        background-color: #c82333;
+    }
+    
+</style>
+        <header>
+            <h1>Shopping Cart</h1>
+        </header>
+  
+        <main>
+                {% for item in cart.cart_items.all %} 
+                <div class="cart-item">
+                    <div class="cart-row">
+                        <div class="cart-column product-imagey">
+                            <img src="/media/{{item.product.product_images.first.image}}" alt="Product Image">  
+                        </div>
+                        
+                        <a style="text-decoration:none;display:flex;align-items:center;" href="{% url 'get_product' item.product.slug %}">
+                            <div class="cart-column product-namey">{{item.product.product_name |truncatechars:18}}</div>
+                        </a>
+
+                                <div class="cart-column product-quantity">Quantity: <!--<input type="number" value="1" min="1">-->1</div>
+                                <div class="cart-column product-quantity">size:{{item.size_variant.size_name}}</div>
+                                <div class="cart-column product-pricey">Price : {{ item.get_product_price }}₹/- </div>
+                                <div class="cart-column remove-btn-container">
+                                    <a href="{% url 'remove_cart' item.uid %}" class="remove-btn"><button class="remove-btn">Remove 
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M4 8H20V21C20 21.5523 19.5523 22 19 22H5C4.44772 22 4 21.5523 4 21V8ZM6 10V20H18V10H6ZM9 12H11V18H9V12ZM13 12H15V18H13V12ZM7 5V3C7 2.44772 7.44772 2 8 2H16C16.5523 2 17 2.44772 17 3V5H22V7H2V5H7ZM9 4V5H15V4H9Z"></path></svg>
+                                    </button></a>
+                                </div>
+                            </div>  
+                        </div>
+                    {% endfor %}
+        </main>  
+
+        <ul class="messages" style="list-style: none; padding: 0; margin: 0; font-family: Arial, sans-serif;float:inline-end;position:relative;right:20px;">
+            {% for message in messages %}
+            <li style="
+                margin-bottom: 10px; padding: 10px; border-radius: 5px; 
+                background-color: {% if message.tags == 'success' %}#d4edda{% elif message.tags == 'error' %}#f8d7da{% elif message.tags == 'warning' %}#fff3cd{% else %}#d1ecf1{% endif %}; 
+                color: {% if message.tags == 'success' %}#155724{% elif message.tags == 'error' %}#721c24{% elif message.tags == 'warning' %}#856404{% else %}#0c5460{% endif %}; 
+                border: 1px solid {% if message.tags == 'success' %}#c3e6cb{% elif message.tags == 'error' %}#f5c6cb{% elif message.tags == 'warning' %}#ffeeba{% else %}#bee5eb{% endif %};
+            ">
+              {{ message }}
+            </li>
+            {% endfor %}
+        </ul> 
+           
+        <div class="cart-total">
+            <strong class="cart-total-title">Total : &nbsp;&nbsp;&nbsp;
+                <span class="cart-total-price">{{cart.get_cart_total}} ₹/-</span>
+            </strong>    
+        </div>
+        <div class="coupon">
+            <form method="POST">
+                {% csrf_token %}
+                <input type="text" name="coupon" placeholder="Enter Coupon Code" required>
+                {% if cart.coupon %}
+                <a href="{% url 'remove_coupon' cart.uid %}" style="text-decoration:none;color:green;">{{cart.coupon.coupon_code}} 
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M11.9997 10.5865L16.9495 5.63672L18.3637 7.05093L13.4139 12.0007L18.3637 16.9504L16.9495 18.3646L11.9997 13.4149L7.04996 18.3646L5.63574 16.9504L10.5855 12.0007L5.63574 7.05093L7.04996 5.63672L11.9997 10.5865Z"></path></svg>
+                </a> Coupon Applied
+                {% endif %}
+                <button id="apply-coupon-code" type="submit">Apply Coupon</button>
+            </form>
+        </div>
+        <div class="cart-buttons">  
+            <a href="" class="btn btn-primary btn-purchase">Proceed to Checkout</a>
+        </div>
+        </a>
+    <br>    
+{% endblock %}

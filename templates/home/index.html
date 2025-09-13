@@ -1,0 +1,83 @@
+{% extends 'base/base.html' %}
+
+{% block start %}
+<style>
+  .hero {
+    background: url(banner.jpg) no-repeat center center/cover;
+    text-align: center;
+    padding: 50px 0;
+    background-color: #f8f9fa;
+  }
+  .hero h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+  }
+  .hero p {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+  }
+  .hero a {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+  }
+  .hero a:hover {
+    background-color: #0056b3;
+  }
+  .containers {
+    display: flex;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+  .items-of-container {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+    text-align: center;
+    padding: 10px;
+  }
+  .items-of-container img {
+    width: 100%;
+    height: auto;
+  }
+  .product-details {
+    padding: 10px 0;
+  }
+  .product-name {
+    color:black;
+    font-size: 1.2em;
+    font-weight: bold;
+  }
+  .product-price {
+    {% comment %} color: #f44336; {% endcomment %}
+    font-size: 1.1em;
+  }
+</style>
+
+<section class="hero">
+  <h1>Welcome to ShopEase</h1>
+  <p>Your one-stop destination for amazing products!</p>
+  <a href="#">Start Shopping</a>
+</section>
+
+<div class="containers">
+  {% for p in products %}
+    <div class="items-of-container">
+      <a href="{% url 'get_product' p.slug %}">
+        <div class="product">
+          <div class="im">
+            <img src="/media/{{ p.product_images.first.image }}" alt="{{ p.product_name }}">
+          </div>
+          <div class="product-details">
+            <span class="product-name">{{ p.product_name|truncatechars:18 }}</span>
+            <span class="product-price"><b>₹</b>{{ p.price }}.00</span>
+          </div>
+        </div>
+      </a>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}
